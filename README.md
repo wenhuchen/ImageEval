@@ -13,6 +13,7 @@ cd textual_inversion
 accelerate run --files [YOUR_DIR] --special_token [TOKEN] --initialize [WORD]
 accelrate run --files dogs/ --special_token [dog] --initialize dog
 ```
+After the training is done, open the ipynb and use the special token to generate new images.
 
 ## For Null-Text Inversion
 
