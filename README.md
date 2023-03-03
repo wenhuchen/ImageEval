@@ -5,8 +5,8 @@ Editing Baselines
 ## For textual inversion
 
 Library Version:
--- Pytorch: 1.13.1+cu117
--- diffusers: 0.13.1
+- Pytorch: 1.13.1+cu117
+- diffusers: 0.13.1
 
 ```
 cd textual_inversion
@@ -17,8 +17,8 @@ accelrate run --files dogs/ --special_token [dog] --initialize dog
 ## For Null-Text Inversion
 
 Library Version:
--- Pytorch: 1.13.1+cu117
--- diffusers: 0.8.0
+- Pytorch: 1.13.1+cu117
+- diffusers: 0.8.0
 
 ```
 cd prompt-to-prompt
