@@ -19,7 +19,7 @@ import torchvision
 from torchvision import transforms
 import matplotlib.pyplot as plt
 import seaborn as sns
-import pandas as pd 
+import pandas as pd
 import argparse
 import numpy as np
 from collections import defaultdict
@@ -96,7 +96,7 @@ def eval(args):
             prompt = prompt.replace('token', class_name)
 
             # Get clip text
-            text = clip.tokenize([prompt]).to(device) 
+            text = clip.tokenize([prompt]).to(device)
 
             with torch.no_grad():
                 output = model.encode_image(inp).cpu().numpy().astype(np.float32).squeeze(0)
@@ -108,7 +108,7 @@ def eval(args):
                 method_mean_dist[label.cpu().numpy().item()].append(dist)
 
             label_list.append(label.cpu().numpy())
-        
+
         print('Mean distances')
         for label in range(1,n_classes):
             if label in method_mean_dist:

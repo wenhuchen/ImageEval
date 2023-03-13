@@ -35,7 +35,7 @@ prompt_list = [
 
 n_samples = 6
 
-pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16).to("cuda") 
+pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16).to("cuda")
 for prompt in prompt_list:
     prompt_new = prompt.replace(class_token, class_name)
     output_string = prompt_new.replace(' ', '_')

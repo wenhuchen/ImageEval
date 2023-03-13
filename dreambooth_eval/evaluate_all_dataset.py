@@ -20,7 +20,7 @@ from torchvision import transforms
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import seaborn as sns
-import pandas as pd 
+import pandas as pd
 import argparse
 import numpy as np
 from collections import defaultdict
@@ -51,13 +51,15 @@ def eval(args):
     overall_mean_dist = defaultdict(list)
 
     all_folders = sorted(glob.glob('{}/*/'.format(args.data_path)))
+    print(all_folders)
 
     for data_folder_path in all_folders:
         print('Computing for', data_folder_path)
         subject_name = data_folder_path.split('/')[-2]
         if args.filter_subjects and subject_name not in included_subjects:
             continue
-        dataset_val = torchvision.datasets.ImageFolder(data_folder_path, transform=val_transform)
+        dataset_val = torchvision.datasets.ImageFolder(
+            data_folder_path, transform=val_transform)
         val_loader = torch.utils.data.DataLoader(
             dataset_val,
             batch_size=1,
@@ -72,31 +74,26 @@ def eval(args):
         for inp, label in val_loader:
             inp = inp.cuda(non_blocking=True)
             label = label.cuda(non_blocking=True)
+            label_list.append(label.cpu().numpy().item())
 
             with torch.no_grad():
                 if args.mode == 'dino':
                     output = model(inp)
                 elif args.mode == 'clip':
                     output = model.encode_image(inp)
-                features_list.append(output.cpu().numpy())
-                features_dict_list[label.cpu().numpy().item()].append(output.cpu().numpy())
-            
-            label_list.append(label.cpu().numpy())
-        
+                output = output.cpu().numpy()
+                features_list.append(output)
+                features_dict_list[label_list[-1]].append(output)
+
         label_npy = np.array(label_list).squeeze()
         features_npy = np.array(features_list).squeeze()
 
         features_dict = defaultdict(partial(np.ndarray, 0))
         for label in range(len(np.unique(label_npy))):
-            features_dict[label] = np.array(features_dict_list[label]).squeeze(0)
+            features_dict[label] = np.array(features_dict_list[label])
 
         df = pd.DataFrame()
         df["y"] = label_npy
-
-        if args.tsne:
-            X_embedded = TSNE(n_components=2, learning_rate='auto', init='random', perplexity=7).fit_transform(features_npy)
-            df["comp-1"] = X_embedded[:,0]
-            df["comp-2"] = X_embedded[:,1]
 
         n_classes = len(df['y'].unique())
 
@@ -105,7 +102,7 @@ def eval(args):
             image_features = image_features / np.linalg.norm(image_features, ord=2)
             image_features2 = image_features2 / np.linalg.norm(image_features2, ord=2)
             return np.dot(image_features, image_features2)
-        
+
         def compute_l2_distance(image_features, image_features2):
             return np.linalg.norm(image_features - image_features2)
 
@@ -122,7 +119,6 @@ def eval(args):
                 dist_list.append(compute_distance(features_npy[idy], features_dict[0][idx]))
             df['dist_{}'.format(idx)] = dist_list
 
-        # print('Feature Distances')
         mean_feat_dist = defaultdict(list)
         for idx in range(features_dict[0].shape[0]):
             # print('Exemplar', idx)
